@@ -1,0 +1,56 @@
+:root {
+    --background-color: #001f3f;
+    --header-color: #0074D9;
+    --text-color: #ffefc1;
+    --button-green: #2ECC40;
+    --hover-green: #40d451;
+    --active-green: #29b83a;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--background-color);
+    font-family: sans-serif;
+}
+
+#score-area {
+    position: absolute;
+    top: 0;
+    width: 100vw;
+    height: 48px;
+    background-color: var(--header-color);
+}
+
+#start-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 8rem;
+    user-select: none;
+}
+
+#start-area h1 {
+    color: var(--text-color)
+}
+
+#start-btn {
+    all: unset;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-size: 24px;
+    background-color: var(--button-green);
+    cursor: pointer;
+}
+
+#start-btn:hover {
+    background-color: var(--hover-green);
+}
+
+#start-btn:active {
+    background-color: var(--active-green);
+}
