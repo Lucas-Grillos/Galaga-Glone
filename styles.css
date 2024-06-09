@@ -54,3 +54,8 @@ body {
 #start-btn:active {
     background-color: var(--active-green);
 }
+
+#canvas {
+    display: none;
+    margin: 96px auto 0;
+}
