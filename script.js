@@ -27,6 +27,11 @@ class Spaceship {
             x: startingPostionX - (this.verticalRect.width/2),
             y: startingPositionY
         }
+
+        this.velocity = {
+            x: 0,
+            y: 0
+        }
     }
 
     draw() {
@@ -37,8 +42,13 @@ class Spaceship {
         ctx.fillStyle = "red"
         ctx.fillRect(this.position.x, this.position.y, this.verticalRect.width, this.verticalRect.height)
     }
-}
 
+    move() {
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+        spaceship.draw();
+    }
+}
 
 const spaceship = new Spaceship(); 
 
@@ -46,7 +56,27 @@ const animate = () => {
     requestAnimationFrame(animate);
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    spaceship.move();
     spaceship.draw();
+}
+
+const moveShip = (key, vel) => {
+    switch(key) {
+        case "ArrowUp":
+            spaceship.velocity.y=-vel;
+            break;
+        
+        case "ArrowDown":
+            spaceship.velocity.y=vel;
+            break;
+        
+        case "ArrowLeft":
+            spaceship.velocity.x=-vel;
+            break;
+
+        case "ArrowRight":
+            spaceship.velocity.x=vel;
+    }
 }
 
 const startGame = () => {
@@ -56,7 +86,10 @@ const startGame = () => {
 };
 
 startBtn.addEventListener("click", startGame);
-document.addEventListener("keydown", (event) => {
-    console.log(event.key);
-})
 
+document.addEventListener("keyup", (event) => {
+    moveShip(event.key, 0)
+})
+document.addEventListener("keydown", (event) => {
+    moveShip(event.key, 3)
+})
