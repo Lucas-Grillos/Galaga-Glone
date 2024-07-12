@@ -9,6 +9,20 @@ const ctx = canvas.getContext("2d");
 const startingPostionX = 300;
 const startingPositionY = 550;
 
+const SHIP_VEL = 2;
+const SHIP_DIAG_VEL = 1.5;
+
+const keyInputsX = {
+    ArrowLeft: false,
+    ArrowRight: false
+}
+
+const keyInputsY = {
+    ArrowUp: false,
+    ArrowDown: false,
+}
+
+
 
 class Spaceship {
     constructor() {
@@ -58,10 +72,41 @@ const animate = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     spaceship.move();
     spaceship.draw();
+    setVelocity();
 }
 
-const moveShip = (key, vel) => {
-    switch(key) {
+const setVelocity = () => {
+    if (keyInputsY.ArrowUp && Object.values(keyInputsX).some(val => val===true) && !keyInputsY.ArrowDown ) {
+        spaceship.velocity.y = -SHIP_DIAG_VEL
+    } else if (keyInputsY.ArrowUp && !keyInputsY.ArrowDown) {
+        spaceship.velocity.y = -SHIP_VEL;} 
+    else if (!keyInputsY.ArrowUp && !keyInputsY.ArrowDown) 
+        {spaceship.velocity.y = 0}
+
+    if (keyInputsY.ArrowDown && Object.values(keyInputsX).some(val => val===true) && !keyInputsY.ArrowUp) {
+        spaceship.velocity.y = SHIP_DIAG_VEL
+    } else if (keyInputsY.ArrowDown && !keyInputsY.ArrowUp) {
+        spaceship.velocity.y = SHIP_VEL;
+    } else if (!keyInputsY.ArrowDown && !keyInputsY.ArrowUp)
+        {spaceship.velocity.y = 0}
+
+    if (keyInputsX.ArrowLeft && Object.values(keyInputsY).some(val => val===true) && !keyInputsX.ArrowRight) {
+        spaceship.velocity.x = -SHIP_DIAG_VEL;
+    } else if (keyInputsX.ArrowLeft && !keyInputsX.ArrowRight) {
+        spaceship.velocity.x = -SHIP_VEL;
+    } else if (!keyInputsX.ArrowLeft && !keyInputsX.ArrowRight) 
+        {spaceship.velocity.x = 0}
+
+    if (keyInputsX.ArrowRight && Object.values(keyInputsY).some(val => val===true) && !keyInputsX.ArrowLeft) {
+        spaceship.velocity.x = SHIP_DIAG_VEL
+    } else if (keyInputsX.ArrowRight && !keyInputsX.ArrowLeft) {
+        spaceship.velocity.x = SHIP_VEL;
+    } else if (!keyInputsX.ArrowRight && !keyInputsX.ArrowLeft) 
+        {spaceship.velocity.x = 0}
+}
+
+const moveShip = (keyInput, vel) => {
+    switch(keyInput) {
         case "ArrowUp":
             spaceship.velocity.y=-vel;
             break;
@@ -76,6 +121,70 @@ const moveShip = (key, vel) => {
 
         case "ArrowRight":
             spaceship.velocity.x=vel;
+            break;
+    }
+}
+
+
+/*
+const moveShip = (keyInput, vel) => {
+    switch(keyInput) {
+        case "ArrowUp":
+            if(Object.values(keyInputsX).some(val => val===true)) {
+                spaceship.velocity.y = -(vel * .6)
+                spaceship.velocity.x = spaceship.velocity.x*.6;
+            }
+            else {spaceship.velocity.y=-vel;}
+            break;
+        
+        case "ArrowDown":
+            if(Object.values(keyInputsX).some(val => val===true)) {
+                spaceship.velocity.y = (vel * .6)
+                spaceship.velocity.x = spaceship.velocity.x*.6;
+            }
+            else {spaceship.velocity.y=vel;}
+            break;
+        
+        case "ArrowLeft":
+            if(Object.values(keyInputsY).some(val => val===true)) {
+                spaceship.velocity.x = -(vel * .6);
+                spaceship.velocity.y = spaceship.velocity.y*.6;
+            }
+            else {spaceship.velocity.x=-vel;}
+            break;
+
+        case "ArrowRight":
+            if(Object.values(keyInputsY).some(val => val===true)) {
+                spaceship.velocity.x = (vel * .6);
+                spaceship.velocity.y = spaceship.velocity.y*.6;
+            }
+            else {spaceship.velocity.x=vel;}
+            break;
+    }
+}
+*/
+
+/*
+const moveShip2 = (keyInput) => {
+    // console.log("Input: " + keyInput)
+    Object.keys(keyInputsX).forEach(keyInputX => {
+        if(keyInput === keyInputX) {
+            spaceship.velocity.x=velocityX[keyInput]
+        }
+    });
+
+    Object.keys(keyInputsY).forEach(keyInputY => {
+        if(keyInput === keyInputY) {
+            spaceship.velocity.y=velocityY[keyInput]
+        }
+    });
+}
+*/
+const keyChanges = (keyInput, bool) => {
+    if(keyInputsX.hasOwnProperty(keyInput)){
+        keyInputsX[keyInput] = bool;
+    } else if (keyInputsY.hasOwnProperty(keyInput)) {
+        keyInputsY[keyInput] = bool;
     }
 }
 
@@ -88,8 +197,13 @@ const startGame = () => {
 startBtn.addEventListener("click", startGame);
 
 document.addEventListener("keyup", (event) => {
-    moveShip(event.key, 0)
+    keyChanges(event.key, false);
+    //moveShip(event.key, 0)
+    //moveShip2(event.key)    
 })
+
 document.addEventListener("keydown", (event) => {
-    moveShip(event.key, 3)
+    keyChanges(event.key, true);
+    //moveShip(event.key, 1)
+    //moveShip2(event.key)
 })
