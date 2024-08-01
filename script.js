@@ -51,13 +51,32 @@ class Spaceship {
     draw() {
         ctx.fillStyle = "red";
         ctx.fillRect(this.position.x - (this.horizontalRect.width - this.verticalRect.width) / 2, 
-                    this.position.y + (this.verticalRect.height-this.horizontalRect.height), 
+                    this.position.y + (this.verticalRect.height - this.horizontalRect.height), 
                     this.horizontalRect.width, this.horizontalRect.height);
         ctx.fillStyle = "red"
         ctx.fillRect(this.position.x, this.position.y, this.verticalRect.width, this.verticalRect.height)
     }
 
     move() {
+
+        if (this.position.x - 7 <= 0 && this.velocity.x < 0) {
+            this.velocity.x = 0;
+        }
+        
+        //width of the vertical rect... + (this.horizontalRect.width - this.verticalRect.width) / 2
+
+        if (this.position.x + (this.verticalRect.width + ((this.horizontalRect.width - this.verticalRect.width) / 2)) >= canvas.width && this.velocity.x > 0) {
+            this.velocity.x = 0;
+        }
+
+        if (this.position.y <= 0 && this.velocity.y < 0) {
+            this.velocity.y = 0;
+        }
+
+        if (this.position.y + this.verticalRect.height >= canvas.height && this.velocity.y > 0) {
+            this.velocity.y = 0;
+        }
+
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
         spaceship.draw();
