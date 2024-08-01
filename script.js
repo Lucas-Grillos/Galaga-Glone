@@ -22,7 +22,28 @@ const keyInputsY = {
     ArrowDown: false,
 }
 
+const fireKey = " ";
 
+class Bullet {
+    constructor() {
+        this.height = 8;
+        this.width = 4;
+        this.velocity = 8;
+        this.position = {
+            x: spaceship.position.x,
+            y: spaceship.position.y
+        }
+    }
+
+    draw() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+
+    move() {
+        this.position.y -= this.velocity;
+    }
+}
 
 class Spaceship {
     constructor() {
@@ -83,7 +104,8 @@ class Spaceship {
     }
 }
 
-const spaceship = new Spaceship(); 
+const spaceship = new Spaceship();
+const bullets = [];
 
 const animate = () => {
     requestAnimationFrame(animate);
@@ -91,6 +113,8 @@ const animate = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     spaceship.move();
     spaceship.draw();
+    bullets.forEach( bullet => bullet.draw() );
+    bullets.forEach( bullet => bullet.move() )
     setVelocity();
 }
 
@@ -183,27 +207,14 @@ const moveShip = (keyInput, vel) => {
 }
 */
 
-/*
-const moveShip2 = (keyInput) => {
-    // console.log("Input: " + keyInput)
-    Object.keys(keyInputsX).forEach(keyInputX => {
-        if(keyInput === keyInputX) {
-            spaceship.velocity.x=velocityX[keyInput]
-        }
-    });
-
-    Object.keys(keyInputsY).forEach(keyInputY => {
-        if(keyInput === keyInputY) {
-            spaceship.velocity.y=velocityY[keyInput]
-        }
-    });
-}
-*/
-const keyChanges = (keyInput, bool) => {
+const keyChanges = (keyInput, bool, keyUpDown) => {
     if(keyInputsX.hasOwnProperty(keyInput)){
         keyInputsX[keyInput] = bool;
     } else if (keyInputsY.hasOwnProperty(keyInput)) {
         keyInputsY[keyInput] = bool;
+    } else if (keyInput === fireKey && bool) {
+        let bullet = new Bullet();
+        bullets.push(bullet);
     }
 }
 
@@ -217,12 +228,10 @@ startBtn.addEventListener("click", startGame);
 
 document.addEventListener("keyup", (event) => {
     keyChanges(event.key, false);
-    //moveShip(event.key, 0)
-    //moveShip2(event.key)    
+    //moveShip(event.key, 0) 
 })
 
 document.addEventListener("keydown", (event) => {
     keyChanges(event.key, true);
     //moveShip(event.key, 1)
-    //moveShip2(event.key)
 })
