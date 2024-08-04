@@ -9,8 +9,12 @@ const ctx = canvas.getContext("2d");
 const startingPostionX = 300;
 const startingPositionY = 550;
 
+let fireInterval = true;
+
 const SHIP_VEL = 2;
 const SHIP_DIAG_VEL = 1.5;
+
+const fireKey = " ";
 
 const keyInputsX = {
     ArrowLeft: false,
@@ -22,8 +26,6 @@ const keyInputsY = {
     ArrowDown: false,
 }
 
-const fireKey = " ";
-
 class Bullet {
     constructor() {
         this.height = 8;
@@ -33,6 +35,7 @@ class Bullet {
             x: spaceship.position.x,
             y: spaceship.position.y
         }
+        this.markedForDeletion = false;
     }
 
     draw() {
@@ -42,6 +45,10 @@ class Bullet {
 
     move() {
         this.position.y -= this.velocity;
+        if (this.position.y < 0) {
+            this.markedForDeletion = true;
+            cleanBullets();
+        }
     }
 }
 
@@ -105,7 +112,7 @@ class Spaceship {
 }
 
 const spaceship = new Spaceship();
-const bullets = [];
+let bullets = [];
 
 const animate = () => {
     requestAnimationFrame(animate);
@@ -116,6 +123,10 @@ const animate = () => {
     bullets.forEach( bullet => bullet.draw() );
     bullets.forEach( bullet => bullet.move() )
     setVelocity();
+}
+
+cleanBullets = () => {
+    bullets = bullets.filter( bullet => !bullet.markedForDeletion )
 }
 
 const setVelocity = () => {
@@ -207,22 +218,33 @@ const moveShip = (keyInput, vel) => {
 }
 */
 
+const fireBullet = () => {
+    let bullet = new Bullet();
+    bullets.push(bullet);
+    fireInterval = false;
+    setTimeout(() => {
+        fireInterval = true;
+      }, "100");
+}
+
 const keyChanges = (keyInput, bool, keyUpDown) => {
     if(keyInputsX.hasOwnProperty(keyInput)){
         keyInputsX[keyInput] = bool;
     } else if (keyInputsY.hasOwnProperty(keyInput)) {
         keyInputsY[keyInput] = bool;
-    } else if (keyInput === fireKey && bool) {
-        let bullet = new Bullet();
-        bullets.push(bullet);
+    } else if (keyInput === fireKey && bool && fireInterval) {
+        fireBullet();
+    } else if (keyInput === "a" && bool) {
+        console.log(bullets)
     }
+    
 }
 
 const startGame = () => {
     startArea.style.display = "none";
     canvas.style.display = "block";
     animate();
-};
+}
 
 startBtn.addEventListener("click", startGame);
 
