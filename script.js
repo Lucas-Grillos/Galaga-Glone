@@ -26,6 +26,45 @@ const keyInputsY = {
     ArrowDown: false,
 }
 
+const LEVEL_1 = [
+    {x: 100, y: -100},
+    {x: 500, y: -150},
+    {x: 200, y: -450},
+    {x: 400, y: -475},
+    {x: 300, y: -865},
+    {x: 250, y: -900},
+    {x: 450, y: -1100},
+    {x: 225, y: -1230},
+    {x: 375, y: -1345}
+]
+
+class Alien {
+    constructor(coords) {
+        this.width = 30;
+        this.height = 20;
+
+        this.position = {
+            x: coords.x,
+            y: coords.y
+        }
+
+        this.velocity = 1.2;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.moveTo(this.position.x, this.position.y);
+        ctx.lineTo(this.position.x + (this.width / 2), this.position.y + this.height);
+        ctx.lineTo(this.position.x + this.width, this.position.y);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+    }
+    
+    move() {
+        this.position.y+=this.velocity;
+    }
+}
+
 class Bullet {
     constructor() {
         this.height = 8;
@@ -45,7 +84,7 @@ class Bullet {
 
     move() {
         this.position.y -= this.velocity;
-        if (this.position.y < 0) {
+        if (this.position.y < -this.height) {
             this.markedForDeletion = true;
             cleanBullets();
         }
@@ -112,7 +151,17 @@ class Spaceship {
 }
 
 const spaceship = new Spaceship();
+//const alien = new Alien();
 let bullets = [];
+let aliens = [];
+
+const createLevel = () => {
+    LEVEL_1.forEach(coords => {
+        let alien = new Alien(coords);
+        aliens.push(alien);
+    })
+}
+createLevel();
 
 const animate = () => {
     requestAnimationFrame(animate);
@@ -120,6 +169,8 @@ const animate = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     spaceship.move();
     spaceship.draw();
+    aliens.forEach( alien => alien.draw() );
+    aliens.forEach( alien => alien.move() );
     bullets.forEach( bullet => bullet.draw() );
     bullets.forEach( bullet => bullet.move() )
     setVelocity();
@@ -235,7 +286,7 @@ const keyChanges = (keyInput, bool, keyUpDown) => {
     } else if (keyInput === fireKey && bool && fireInterval) {
         fireBullet();
     } else if (keyInput === "a" && bool) {
-        console.log(bullets)
+        console.log(aliens)
     }
     
 }
