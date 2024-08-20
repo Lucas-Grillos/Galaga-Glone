@@ -3,7 +3,7 @@ const startBtn = document.getElementById("start-btn")
 
 const canvas = document.getElementById("canvas");
 canvas.width = 600;
-canvas.height = 600;
+canvas.height = 800;
 const ctx = canvas.getContext("2d");
 
 const startingPostionX = 300;
@@ -11,8 +11,8 @@ const startingPositionY = 550;
 
 let fireInterval = true;
 
-const SHIP_VEL = 2;
-const SHIP_DIAG_VEL = 1.5;
+const SHIP_VEL = 2.5;
+const SHIP_DIAG_VEL = 1.5 ;
 
 const fireKey = " ";
 
@@ -27,6 +27,7 @@ const keyInputsY = {
 }
 
 const LEVEL_1 = [
+    {x: 0, y:-100},
     {x: 100, y: -100},
     {x: 500, y: -150},
     {x: 200, y: -450},
@@ -40,8 +41,8 @@ const LEVEL_1 = [
 
 class Alien {
     constructor(coords) {
-        this.width = 30;
-        this.height = 20;
+        this.width = 40;
+        this.height = 30;
 
         this.position = {
             x: coords.x,
@@ -49,6 +50,7 @@ class Alien {
         }
 
         this.velocity = 1.2;
+        this.markedForDeletion = false;
     }
 
     draw() {
@@ -62,16 +64,19 @@ class Alien {
     
     move() {
         this.position.y+=this.velocity;
+        if (this.markedForDeletion) {
+            cleanAliens();
+        }
     }
 }
 
 class Bullet {
     constructor() {
-        this.height = 8;
-        this.width = 4;
-        this.velocity = 8;
+        this.height = 12;
+        this.width = 6;
+        this.velocity = 6;
         this.position = {
-            x: spaceship.position.x,
+            x: spaceship.position.x + (spaceship.verticalRect.width / 2) - (this.width / 2),
             y: spaceship.position.y
         }
         this.markedForDeletion = false;
@@ -84,10 +89,25 @@ class Bullet {
 
     move() {
         this.position.y -= this.velocity;
-        if (this.position.y < -this.height) {
+        if (this.position.y < -this.height || this.checkForBullseye()) {
             this.markedForDeletion = true;
             cleanBullets();
         }
+        this.checkForBullseye();
+    }
+
+    checkForBullseye() {
+        
+        if(aliens.length>0) {
+            let bullseye = aliens.some(alien => {
+                if(this.position.y <= alien.position.y && (this.position.x >= alien.position.x && this.position.x <= alien.position.x+alien.width)) {
+                    alien.markedForDeletion = true;
+                    return true;
+                }
+            })
+            return bullseye;
+        }
+        
     }
 }
 
@@ -95,13 +115,21 @@ class Spaceship {
     constructor() {
 
         this.verticalRect = {
+            /*
             width: 10,
             height: 30
+            */
+           width: 15,
+           height: 45
         }
 
         this.horizontalRect = {
+            /*
             width: 24,
             height: 10
+            */
+           width: 36,
+           height: 15
         }
 
         this.position = {
@@ -125,8 +153,8 @@ class Spaceship {
     }
 
     move() {
-
-        if (this.position.x - 7 <= 0 && this.velocity.x < 0) {
+        // - (this.horizontalRect.width - this.verticalRect.width) / 2 
+        if (this.position.x  - ((this.horizontalRect.width - this.verticalRect.width) / 2) <= 0 && this.velocity.x < 0) {
             this.velocity.x = 0;
         }
         
@@ -178,6 +206,10 @@ const animate = () => {
 
 cleanBullets = () => {
     bullets = bullets.filter( bullet => !bullet.markedForDeletion )
+}
+
+cleanAliens = () => {
+    aliens = aliens.filter( alien => !alien.markedForDeletion ) 
 }
 
 const setVelocity = () => {
@@ -286,7 +318,7 @@ const keyChanges = (keyInput, bool, keyUpDown) => {
     } else if (keyInput === fireKey && bool && fireInterval) {
         fireBullet();
     } else if (keyInput === "a" && bool) {
-        console.log(aliens)
+        console.log(spaceship.position.x)
     }
     
 }
