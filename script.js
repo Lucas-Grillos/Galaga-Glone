@@ -7,7 +7,7 @@ canvas.height = 800;
 const ctx = canvas.getContext("2d");
 
 const startingPostionX = 300;
-const startingPositionY = 550;
+const startingPositionY = 700;
 
 let fireInterval = true;
 
@@ -49,9 +49,13 @@ class Alien {
             x: coords.x,
             y: coords.y
         }
-        this.init_velocity = 1.2;
+
+        this.velocity = {
+            x: .5 * (this.getRandom(2) == 0 ? -1 : 1),
+            y: 1.2
+        }
+
         this.velocity_variance = 3;
-        this.velocity;
         this.markedForDeletion = false;
     }
 
@@ -65,7 +69,13 @@ class Alien {
     }
     
     move() {
-        this.position.y+=this.velocity;
+        this.position.y+=this.velocity.y;
+        this.position.x+=this.velocity.x;
+
+        if (this.position.x < 0 || this.position.x+this.width > canvas.width) {
+            this.velocity.x = this.velocity.x * -1;
+        }
+
         if (this.markedForDeletion) {
             cleanAliens();
         }
@@ -76,7 +86,7 @@ class Alien {
     }
 
     varyVelocity() {
-        this.velocity = Number((this.init_velocity + (this.getRandom(this.velocity_variance) / 10) * (this.getRandom(2) == 0 ? -1 : 1)).toFixed(1))
+        this.velocity.y = Number((this.velocity.y + (this.getRandom(this.velocity_variance) / 10) * (this.getRandom(2) == 0 ? -1 : 1)).toFixed(1))
         // adds or subtracts ( * this.getRandom(2) == 0 ? -1 : 1 ) a random number between 0 and 2 (this.velocity_variance) to our
         // init_velocity. toFixed(1) makes certain that we're staying at only 1 digit place past the decimal, and Number() converts the
         // resulting string back into a number
@@ -84,6 +94,7 @@ class Alien {
 }
 
 class Bullet {
+    
     constructor() {
         this.height = 12;
         this.width = 6;
@@ -223,6 +234,7 @@ cleanBullets = () => {
 }
 
 cleanAliens = () => {
+    console.log(aliens)
     aliens = aliens.filter( alien => !alien.markedForDeletion ) 
 }
 
