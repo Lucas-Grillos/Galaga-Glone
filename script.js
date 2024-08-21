@@ -11,8 +11,8 @@ const startingPositionY = 550;
 
 let fireInterval = true;
 
-const SHIP_VEL = 2.5;
-const SHIP_DIAG_VEL = 1.5 ;
+const SHIP_VEL = 3;
+const SHIP_DIAG_VEL = 2;
 
 const fireKey = " ";
 
@@ -43,13 +43,15 @@ class Alien {
     constructor(coords) {
         this.width = 40;
         this.height = 30;
+        
 
         this.position = {
             x: coords.x,
             y: coords.y
         }
-
-        this.velocity = 1.2;
+        this.init_velocity = 1.2;
+        this.velocity_variance = 3;
+        this.velocity;
         this.markedForDeletion = false;
     }
 
@@ -67,6 +69,17 @@ class Alien {
         if (this.markedForDeletion) {
             cleanAliens();
         }
+    }
+
+    getRandom(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    varyVelocity() {
+        this.velocity = Number((this.init_velocity + (this.getRandom(this.velocity_variance) / 10) * (this.getRandom(2) == 0 ? -1 : 1)).toFixed(1))
+        // adds or subtracts ( * this.getRandom(2) == 0 ? -1 : 1 ) a random number between 0 and 2 (this.velocity_variance) to our
+        // init_velocity. toFixed(1) makes certain that we're staying at only 1 digit place past the decimal, and Number() converts the
+        // resulting string back into a number
     }
 }
 
@@ -186,6 +199,7 @@ let aliens = [];
 const createLevel = () => {
     LEVEL_1.forEach(coords => {
         let alien = new Alien(coords);
+        alien.varyVelocity();
         aliens.push(alien);
     })
 }
