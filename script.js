@@ -7,7 +7,7 @@ canvas.height = 800;
 const ctx = canvas.getContext("2d");
 
 const startingPostionX = 300;
-const startingPositionY = 700;
+const startingPositionY = 750;
 
 let fireInterval = true;
 
@@ -124,7 +124,7 @@ class Bullet {
         
         if(aliens.length>0) {
             let bullseye = aliens.some(alien => {
-                if(this.position.y <= alien.position.y && (this.position.x >= alien.position.x && this.position.x <= alien.position.x+alien.width)) {
+                if(this.position.y <= alien.position.y + (alien.height/2) && this.position.y >= alien.position.y && (this.position.x >= alien.position.x && this.position.x <= alien.position.x + alien.width)) {
                     alien.markedForDeletion = true;
                     return true;
                 }
@@ -234,7 +234,6 @@ cleanBullets = () => {
 }
 
 cleanAliens = () => {
-    console.log(aliens)
     aliens = aliens.filter( alien => !alien.markedForDeletion ) 
 }
 
