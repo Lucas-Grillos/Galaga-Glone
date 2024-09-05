@@ -2,11 +2,11 @@ const startArea = document.getElementById("start-area");
 const startBtn = document.getElementById("start-btn")
 
 const canvas = document.getElementById("canvas");
-canvas.width = 600;
+canvas.width = 500;
 canvas.height = 800;
 const ctx = canvas.getContext("2d");
 
-const startingPostionX = 300;
+const startingPostionX = 250;
 const startingPositionY = 750;
 
 let fireInterval = true;
@@ -27,9 +27,9 @@ const keyInputsY = {
 }
 
 const LEVEL_1 = [
-    {x: 0, y:-100},
+    {x: 0, y: -100},
     {x: 100, y: -100},
-    {x: 500, y: -150},
+    {x: 425, y: -150},
     {x: 200, y: -450},
     {x: 400, y: -475},
     {x: 300, y: -865},
@@ -38,6 +38,32 @@ const LEVEL_1 = [
     {x: 225, y: -1230},
     {x: 375, y: -1345}
 ]
+
+class Alien_Bullet {
+    constructor(coords) {
+        this.position = {
+            x: coords.x,
+            y: coords.y
+        }
+        this.velocity = {
+            x: 0,
+            y: 1
+        }
+
+        this.radius = 3;
+    }
+
+    draw() {
+        ctx.beginPath();
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, 2*Math.PI, false);
+        ctx.fillStyle = "yellow";
+        ctx.fill();
+    }
+    
+    move() {
+        this.position.y += this.velocity.y;
+    }
+}
 
 class Alien {
     constructor(coords) {
@@ -51,12 +77,14 @@ class Alien {
         }
 
         this.velocity = {
-            x: .5 * (this.getRandom(2) == 0 ? -1 : 1),
+            x: .5 * (this.oneOrNeg1()), // moving left or right
             y: 1.2
         }
 
-        this.velocity_variance = 3;
+        this.velocity_variance = 4;
         this.markedForDeletion = false;
+        this.hasBullet = this.oneOrNeg1() == 1 ? true : false;
+        this.fireBulletLocation = this.getRandom(300) + 100;  
     }
 
     draw() {
@@ -68,25 +96,42 @@ class Alien {
         ctx.fill();
     }
     
+    fireBullet() {
+        let alienbullet = new Alien_Bullet(this.position);
+        alien_bullets.push(alienbullet);
+        this.hasBullet = false;
+    }
+    
     move() {
         this.position.y+=this.velocity.y;
         this.position.x+=this.velocity.x;
 
         if (this.position.x < 0 || this.position.x+this.width > canvas.width) {
             this.velocity.x = this.velocity.x * -1;
+            // check to see if alien's bounds are verging over left or right width of the screen, and then reverses it's velocity
         }
 
         if (this.markedForDeletion) {
             cleanAliens();
         }
+        
+        if (this.hasBullet && this.position.y >= this.fireBulletLocation) {
+            this.fireBullet()
+        }
+        
     }
 
     getRandom(max) {
         return Math.floor(Math.random() * max);
     }
 
+    oneOrNeg1() {
+        return this.getRandom(2) == 0 ? -1 : 1;
+    }
+
     varyVelocity() {
-        this.velocity.y = Number((this.velocity.y + (this.getRandom(this.velocity_variance) / 10) * (this.getRandom(2) == 0 ? -1 : 1)).toFixed(1))
+        this.velocity.y = Number((this.velocity.y + (this.getRandom(this.velocity_variance) / 10) * (this.oneOrNeg1())).toFixed(1))
+
         // adds or subtracts ( * this.getRandom(2) == 0 ? -1 : 1 ) a random number between 0 and 2 (this.velocity_variance) to our
         // init_velocity. toFixed(1) makes certain that we're staying at only 1 digit place past the decimal, and Number() converts the
         // resulting string back into a number
@@ -203,9 +248,9 @@ class Spaceship {
 }
 
 const spaceship = new Spaceship();
-//const alien = new Alien();
 let bullets = [];
 let aliens = [];
+let alien_bullets = [];
 
 const createLevel = () => {
     LEVEL_1.forEach(coords => {
@@ -222,10 +267,20 @@ const animate = () => {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     spaceship.move();
     spaceship.draw();
-    aliens.forEach( alien => alien.draw() );
-    aliens.forEach( alien => alien.move() );
-    bullets.forEach( bullet => bullet.draw() );
-    bullets.forEach( bullet => bullet.move() )
+    
+    if( aliens.length) {
+        aliens.forEach( alien => alien.draw() );
+        aliens.forEach( alien => alien.move() );
+    }
+
+    if (bullets.length) {
+        bullets.forEach( bullet => bullet.draw() );
+        bullets.forEach( bullet => bullet.move() );
+    }
+    if (alien_bullets) {
+        alien_bullets.forEach( alienbullet => alienbullet.draw() );
+        alien_bullets.forEach( alienbullet => alienbullet.move() );
+    }
     setVelocity();
 }
 
