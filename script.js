@@ -47,10 +47,24 @@ class Alien_Bullet {
         }
         this.velocity = {
             x: 0,
-            y: 1
+            y: 0
         }
 
+        this.speed = 3;
         this.radius = 3;
+    }
+
+    findDistanceFromShip() {
+        let distanceA = spaceship.position.y - this.position.y;
+        let distanceB = spaceship.position.x - this.position.x;
+        let speedDistanceMultiplier = this.speed / (Math.abs(distanceA) + Math.abs(distanceB));
+        console.log(speedDistanceMultiplier);
+        let speedA = parseFloat((distanceA * speedDistanceMultiplier).toFixed(3));
+        let speedB = parseFloat((distanceB * speedDistanceMultiplier).toFixed(3));
+        console.log(speedA);
+        console.log(typeof(speedB));
+        this.velocity.x = speedB;
+        this.velocity.y = speedA;
     }
 
     draw() {
@@ -62,6 +76,7 @@ class Alien_Bullet {
     
     move() {
         this.position.y += this.velocity.y;
+        this.position.x += this.velocity.x;
     }
 }
 
@@ -98,6 +113,7 @@ class Alien {
     
     fireBullet() {
         let alienbullet = new Alien_Bullet(this.position);
+        alienbullet.findDistanceFromShip();
         alien_bullets.push(alienbullet);
         this.hasBullet = false;
     }
@@ -272,7 +288,6 @@ const animate = () => {
         aliens.forEach( alien => alien.draw() );
         aliens.forEach( alien => alien.move() );
     }
-
     if (bullets.length) {
         bullets.forEach( bullet => bullet.draw() );
         bullets.forEach( bullet => bullet.move() );
