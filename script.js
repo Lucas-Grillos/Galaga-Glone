@@ -55,16 +55,11 @@ class Alien_Bullet {
     }
 
     findDistanceFromShip() {
-        let distanceA = spaceship.position.y - this.position.y;
-        let distanceB = spaceship.position.x - this.position.x;
-        let speedDistanceMultiplier = this.speed / (Math.abs(distanceA) + Math.abs(distanceB));
-        console.log(speedDistanceMultiplier);
-        let speedA = parseFloat((distanceA * speedDistanceMultiplier).toFixed(3));
-        let speedB = parseFloat((distanceB * speedDistanceMultiplier).toFixed(3));
-        console.log(speedA);
-        console.log(typeof(speedB));
-        this.velocity.x = speedB;
-        this.velocity.y = speedA;
+        let distanceX = spaceship.position.x - this.position.x;
+        let distanceY = spaceship.position.y - this.position.y;
+        let speedDistanceMultiplier = this.speed / ( Math.abs(distanceX) + Math.abs(distanceY));
+        this.velocity.x = parseFloat((distanceX * speedDistanceMultiplier).toFixed(3));
+        this.velocity.y = parseFloat((distanceY * speedDistanceMultiplier).toFixed(3));
     }
 
     draw() {
@@ -73,10 +68,15 @@ class Alien_Bullet {
         ctx.fillStyle = "yellow";
         ctx.fill();
     }
+
+    hit() {
+
+    }
     
     move() {
         this.position.y += this.velocity.y;
         this.position.x += this.velocity.x;
+
     }
 }
 
@@ -217,6 +217,11 @@ class Spaceship {
            height: 15
         }
 
+        this.hitbox = {
+            width: 25,
+            height: 37
+        }
+        
         this.position = {
             x: startingPostionX - (this.verticalRect.width/2),
             y: startingPositionY
@@ -233,8 +238,12 @@ class Spaceship {
         ctx.fillRect(this.position.x - (this.horizontalRect.width - this.verticalRect.width) / 2, 
                     this.position.y + (this.verticalRect.height - this.horizontalRect.height), 
                     this.horizontalRect.width, this.horizontalRect.height);
-        ctx.fillStyle = "red"
+        ctx.fillStyle = "red";
         ctx.fillRect(this.position.x, this.position.y, this.verticalRect.width, this.verticalRect.height)
+        ctx.strokeStyle = "blue";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.position.x, this.position.y, this.hitbox.width, this.hitbox.height);
+        
     }
 
     move() {
@@ -245,7 +254,8 @@ class Spaceship {
         
         //width of the vertical rect... + (this.horizontalRect.width - this.verticalRect.width) / 2
 
-        if (this.position.x + (this.verticalRect.width + ((this.horizontalRect.width - this.verticalRect.width) / 2)) >= canvas.width && this.velocity.x > 0) {
+        if (this.position.x + (this.verticalRect.width + ((this.horizontalRect.width - this.verticalRect.width) / 2)) 
+            >= canvas.width && this.velocity.x > 0) {
             this.velocity.x = 0;
         }
 
